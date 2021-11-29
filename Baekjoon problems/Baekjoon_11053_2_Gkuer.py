@@ -10,4 +10,5 @@ for i in range(n):
             cnt[i] = cnt[x]
     cnt[i] += 1
 print(max(cnt))
+
 # Pass
