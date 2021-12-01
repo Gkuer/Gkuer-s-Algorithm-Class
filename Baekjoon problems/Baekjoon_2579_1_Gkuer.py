@@ -14,4 +14,5 @@ for i in range(3,n):
     maps[i] = max(maps[i-2]+arr[i], maps[i-3]+arr[i-1]+arr[i])
 
 print(maps[n-1])
+
 # Pass
