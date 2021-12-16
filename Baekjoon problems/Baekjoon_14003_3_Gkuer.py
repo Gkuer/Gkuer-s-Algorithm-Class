@@ -2,6 +2,8 @@ from bisect import bisect_left
 import sys
 input = sys.stdin.readline
 
+def bin_search():
+    s, e = 0, len
 n = int(input())
 maps = list(map(int,input().split()))
 
