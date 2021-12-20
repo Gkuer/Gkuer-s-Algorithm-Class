@@ -8,7 +8,7 @@ public class Main {
 		int n2 = sc.nextInt();
 		sc.close();
 		
-		int ans = n1 + n2;
+		int ans = n1 * n2;
 		System.out.println(ans);
 	}
 
