@@ -14,5 +14,5 @@ for i in range(n):
             print(heapq.heappop(q)[1])
         else:
             print(0)
-            
+
 # Pass
