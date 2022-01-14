@@ -15,3 +15,5 @@ def perm(start):
 n, m = map(int,input().split())
 maps = []
 perm(1)
+
+# Pass
