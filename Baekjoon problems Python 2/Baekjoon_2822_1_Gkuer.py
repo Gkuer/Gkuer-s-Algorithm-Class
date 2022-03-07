@@ -16,3 +16,5 @@ for i in range(1,9):
 
 print(sm)
 print(*sub_ans)
+
+# Pass
