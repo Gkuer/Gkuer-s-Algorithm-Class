@@ -1,47 +1,149 @@
-def solution(total_sp, skills):
-    def recur(pos, ini):
-        if temps[pos]:
-            return temps[pos]
-        if maps.get(pos):
-            for i in maps[pos]:
-                temps[pos] += recur(i, ini)
+import copy
+from collections import deque
+
+def solution(n, m, room, bath):
+    global answer, pres
+
+    dirs = [(0,1),(0,-1),(1,0),(-1,0)]
+    def check1(check_maps1):
+        already = []
+        ready = []
+        for i in range(n):
+            for j in range(m):
+                if check_maps1[i][j] and check_maps1[i][j] not in already:
+                    already.append(check_maps1[i][j])
+                    ready.append([i,j])
+
+        for i in range(len(already)):
+            if already[i] < 100:
+                rng_x, rng_y = 2, 2
+            elif already[i] < 200:
+                rng_x, rng_y = 2, 1
+            else:
+                rng_x, rng_y = 1, 2
+
+            flag = False
+            for r in range(rng_x):
+                for c in range(rng_y):
+                    for j in range(4):
+                        nr = ready[i][0] + r + dirs[j][0]
+                        nc = ready[i][1] + c + dirs[j][1]
+                        if 0 <= nr < n and 0 <= nc < m:
+                            if check_maps1[nr][nc] == 0:
+                                flag = True
+                                break
+                    if flag:
+                        break
+                if flag:
+                    break
+            else:
+                return False
+
+        return True
+
+    def check2(check_maps2):
+        flag = False
+        for i in range(n):
+            for j in range(m):
+                if check_maps2[i][j] == 0:
+                    ini_x = i
+                    ini_y = j
+                    flag = True
+                    break
+            if flag:
+                break
+
+        if not flag:
+            return False
+
+        q = deque()
+        q.append([ini_x, ini_y])
+        check_maps2[ini_x][ini_y] = -1
+        while q:
+            r, c = q.popleft()
+            for k in range(4):
+                nr = r + dirs[k][0]
+                nc = c + dirs[k][1]
+                if 0 <= nr < n and 0 <= nc < m:
+                    if check_maps2[nr][nc] == 0:
+                        check_maps2[nr][nc] = -1
+                        q.append([nr,nc])
+
+        for i in range(n):
+            for j in range(m):
+                if check_maps2[i][j] == 0:
+                    return False
+
+        return True
+
+    def check3(check_maps3):
+        for i in range(n):
+            for j in range(m):
+                if check_maps3[i][j] == 0:
+                    for k in range(4):
+                        nr = i + dirs[k][0]
+                        nc = j + dirs[k][1]
+                        if not(0 <= nr < n and 0 <= nc < m):
+                            return True
+        return False
+
+    def find(maps, mode, cnts):
+        global answer, pres
+
+        if cnts == [0,0,0]:
+            if maps not in pres:
+                pres.append(copy.deepcopy(maps))
+                if check1(copy.deepcopy(maps)) and check2(copy.deepcopy(maps)) and check3(copy.deepcopy(maps)):
+                    answer += 1
+                return
+
+        if mode == 0:
+            x_rng, y_rng = 2, 2
+        elif mode == 1:
+            x_rng, y_rng = 2, 1
         else:
-            temps[pos] = ini
-            return temps[pos]
+            x_rng, y_rng = 1, 2
 
-    mx = len(skills) + 1
-    maps = {}
-    temps = []
-    # 여기 추가
-    # Root를 한번에 찾기 위해 True Array 선언    isRootArr = [True for i in range(mx+1)]
-    for a, b in skills:
-        temps.append(a)
-        # 여기 추가
-        # skills 배열에서 등장하지 않는 원소는 없다.
-        # skills 배열에서 두번째로 등장하지 않는 원소가 Root가 된다.
-        # isRootArr[b] = False        if a not in maps:
-        maps[a] = [b]
-    else:
-        maps[a].append(b)
+        for r in range(n):
+            for c in range(m):
+                flag = 0
+                for i in range(x_rng):
+                    for j in range(y_rng):
+                        nr = r + i
+                        nc = c + j
+                        if 0 <= nr < n and 0 <= nc < m:
+                            if maps[nr][nc] == 0:
+                                flag += 1
 
+                if flag == x_rng*y_rng:
+                    temps = copy.deepcopy(maps)
+                    for i in range(x_rng):
+                        for j in range(y_rng):
+                            nr = r + i
+                            nc = c + j
+                            temps[nr][nc] = 100*mode + cnts[mode] + 1
 
-    # 여기 추가
-    # skills 내부배열에서 두번째 원소로로 등장하지 않았던 원소가 Root    root = isRootArr.index(True,1)
+                    cnts[mode] -= 1
+                    next = 0
+                    for i in range(3):
+                        if cnts[i]:
+                            next = i
+                            break
 
-    # 여기 제거
-    # Find Root
-    # for i in temps:
-    #    for j in maps:
-    #       if i in maps[j]:
-    #           break
-    #    else:    #
-    #    root = i    #
-    #    break
-    # Find Relation Cnt
-    # temps = [0 for i in range(mx+1)]
-    sm = recur(root, 1)
-    # Find Inition value    init_val = total_sp // sum(temps)
-    # Refactor maps    for i in range(mx+1):
-    temps[i] = init_val * temps[i]
-    answer = temps[1:]
+                    find(temps, next, cnts)
+                    cnts[i] += 1
+                    for i in range(x_rng):
+                        for j in range(y_rng):
+                            nr = r + i
+                            nc = c + j
+                            temps[nr][nc] = 0
+
+    answer = 0
+    inis = [[0]*m for _ in range(n)]
+    pres = []
+
+    find(inis,0,[room,0,1])
+
     return answer
+
+print(solution(4,5,3,1))
