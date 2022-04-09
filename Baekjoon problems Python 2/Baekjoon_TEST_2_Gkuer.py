@@ -7,7 +7,7 @@ a = [2,3,5,7]
 b = [5,5,2,1]
 ans = []
 
-a_cnt = 10
+a_cnt = 10sd
 b_cnt = 5
 
 for i in range(len(a)):
